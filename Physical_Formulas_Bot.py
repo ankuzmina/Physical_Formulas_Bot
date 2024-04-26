@@ -72,7 +72,7 @@ async def help_command(update: Update, context):
     /add_formula <section> <name> <formula> <description> - добавить формулу
     /delete_section <name> - удалить раздел
     /delete_formula <section> <name> - удалить формулу из раздела
-    /all - названия всех разделоф и формул в них
+    /all - названия всех разделов и формул в них
     /save - сохранить изменения
     /formula_help <название формулы> - получить дополнительную информацию о формуле
     """
