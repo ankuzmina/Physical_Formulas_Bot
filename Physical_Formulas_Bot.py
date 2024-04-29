@@ -9,17 +9,16 @@ from telegram.ext import InlineQueryHandler  # Импорт обработчик
 from telegram import InlineQueryResultArticle, InputTextMessageContent  # Импорт типов результатов инлайн-запроса
 from uuid import uuid4  # Импорт функции для генерации уникальных идентификаторов
 
+from my_token import TOKEN
 
 # Настройка логгирования
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Токен моего бота
-TOKEN = "6860539104:AAFbuxFGm0GaBUcXfAhdXCXx9BHCGOrITSk"
-
 # Директория для временных файлов
 TEMP_DIR = "temp"
+
 
 # Загрузка формул из файла
 def load_formulas(filename):
@@ -48,8 +47,10 @@ def load_formulas(filename):
                 formulas[current_section].append((formula_name, formula.strip(), description.strip()))
     return formulas
 
+
 # Словарь всех формул
 all_formulas = load_formulas("formulas.txt")
+
 
 # Команды для базового управления
 async def start(update: Update, context):
@@ -57,6 +58,7 @@ async def start(update: Update, context):
     Команда /start. Начало работы с ботом.
     """
     await update.message.reply_text("Привет! Я бот формул физики. Используй /help для списка команд.")
+
 
 async def help_command(update: Update, context):
     """
@@ -78,6 +80,7 @@ async def help_command(update: Update, context):
     """
     await update.message.reply_text(help_text)
 
+
 async def random_formula(update: Update, context):
     """
     Команда /random. Выводит случайную формулу из всех разделов.
@@ -85,6 +88,7 @@ async def random_formula(update: Update, context):
     section = random.choice(list(all_formulas.keys()))
     formula_name, formula, description = random.choice(all_formulas[section])
     await send_formula(update, section, formula_name, formula, description)
+
 
 async def search_formula(update: Update, context):
     """
@@ -102,6 +106,7 @@ async def search_formula(update: Update, context):
     else:
         await update.message.reply_text("Формула не найдена.")
 
+
 async def add_section(update: Update, context):
     """
     Команда /add_section <название раздела>. Добавляет новый раздел.
@@ -113,13 +118,15 @@ async def add_section(update: Update, context):
     else:
         await update.message.reply_text("Укажите название раздела или такой раздел уже существует.")
 
+
 async def add_formula(update: Update, context):
     """
     Команда /add_formula <раздел> <название> <формула> <описание>. Добавляет новую формулу в указанный раздел.
     """
     args = context.args
     if len(args) < 4:
-        await update.message.reply_text("Недостаточно аргументов. Используйте формат /add_formula <раздел> <название> <формула> <описание>")
+        await update.message.reply_text(
+            "Недостаточно аргументов. Используйте формат /add_formula <раздел> <название> <формула> <описание>")
         return
     section = args[0]
     if section in all_formulas:
@@ -130,6 +137,7 @@ async def add_formula(update: Update, context):
         await update.message.reply_text(f"Формула '{name}' добавлена в раздел '{section}'.")
     else:
         await update.message.reply_text("Раздел не найден. Добавьте раздел командой /add_section.")
+
 
 def save_formulas(formulas, filename):
     """
@@ -146,6 +154,7 @@ def save_formulas(formulas, filename):
                 file.write(f"### {name}\n")
                 file.write(f"{formula}|||{description}\n")
 
+
 def all_sections_and_formulas():
     """
     Возвращает строку со списком всех разделов и формул в них.
@@ -160,6 +169,7 @@ def all_sections_and_formulas():
             result += f"- {name}\n"
     return result
 
+
 async def all_sections_and_formulas_command(update: Update, context):
     """
     Команда /all. Выводит названия всех разделов и формул в них.
@@ -167,12 +177,14 @@ async def all_sections_and_formulas_command(update: Update, context):
     message = all_sections_and_formulas()
     await update.message.reply_text(message)
 
+
 async def save(update: Update, context):
     """
     Команда /save. Сохраняет изменения в формулах.
     """
     save_formulas(all_formulas, "formulas.txt")
     await update.message.reply_text("Формулы сохранены.")
+
 
 # Функция для отправки формулы в чат
 async def send_formula(update: Update, section: str, name: str, formula: str, description: str):
@@ -205,6 +217,7 @@ async def send_formula(update: Update, section: str, name: str, formula: str, de
     # Удаление временного файла PNG
     os.remove(image_path)
 
+
 async def delete_section(update: Update, context):
     """
     Команда /delete_section <название раздела>. Удаляет указанный раздел.
@@ -216,13 +229,15 @@ async def delete_section(update: Update, context):
     else:
         await update.message.reply_text("Указанный раздел не существует.")
 
+
 async def delete_formula(update: Update, context):
     """
     Команда /delete_formula <раздел> <название>. Удаляет указанную формулу из указанного раздела.
     """
     args = context.args
     if len(args) < 2:
-        await update.message.reply_text("Недостаточно аргументов. Используйте формат /delete_formula <раздел> <название>")
+        await update.message.reply_text(
+            "Недостаточно аргументов. Используйте формат /delete_formula <раздел> <название>")
         return
     section = args[0]
     name = args[1]
@@ -236,6 +251,7 @@ async def delete_formula(update: Update, context):
         await update.message.reply_text("Указанная формула не найдена в указанном разделе.")
     else:
         await update.message.reply_text("Указанный раздел не существует.")
+
 
 async def formula_help(update: Update, context):
     """
@@ -255,6 +271,7 @@ async def formula_help(update: Update, context):
         await send_formula(update, section, name, formula, description)
     else:
         await update.message.reply_text("Формула не найдена.")
+
 
 async def inline_query(update: Update, context):
     """Обработчик inline-запросов."""
@@ -281,8 +298,8 @@ async def inline_query(update: Update, context):
     await update.inline_query.answer(results, cache_time=0)
     # Отправляем результаты в ответ на запрос пользователя с отключенным кэшированием
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Создаем асинхронную очередь для обновлений
     update_queue = asyncio.Queue()
 
