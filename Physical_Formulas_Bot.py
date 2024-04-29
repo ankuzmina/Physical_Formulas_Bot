@@ -15,10 +15,14 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Токен моего бота
-TOKEN = "6860539104:AAFbuxFGm0GaBUcXfAhdXCXx9BHCGOrITSk"
+# Путь к файлу с токеном
+token_file = 'my_token.txt'
 
-# Директория для временных файлов
+# Токен моего бота
+with open(token_file, 'r') as file:
+    token = file.read().strip()  # Читаем содержимое файла и удаляем лишние пробелы и переносы строк
+
+ # Директория для временных файлов
 TEMP_DIR = "temp"
 
 # Загрузка формул из файла
@@ -287,7 +291,7 @@ if __name__ == "__main__":
     update_queue = asyncio.Queue()
 
     # Создаем объект приложения
-    app = Application.builder().token(TOKEN).update_queue(update_queue).build()
+    app = Application.builder().token(token).update_queue(update_queue).build()
 
     # Регистрируем обработчики команд
     app.add_handler(CommandHandler("start", start))
